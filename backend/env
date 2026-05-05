@@ -1,0 +1,5 @@
+# ==================== ORACLE CLOUD CONFIG ====================
+ORACLE_USER=ADMIN
+ORACLE_PASSWORD=Panaderia2024!
+ORACLE_DSN=panaderia_tp
+ORACLE_WALLET_DIR=C:\Users\juanes\Descargas\oracle_wallet

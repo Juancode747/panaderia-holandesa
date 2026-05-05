@@ -1,0 +1,120 @@
+/* App-specific styles */
+.login-bg {
+    background: linear-gradient(135deg, rgba(74, 59, 50, 0.9) 0%, rgba(74, 59, 50, 0.7) 100%),
+                url('https://images.unsplash.com/photo-1473552486657-64356a22e365?q=85&w=1920&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+}
+
+.sidebar {
+    @apply bg-card border-r border-border min-h-screen;
+}
+
+.sidebar-link {
+    @apply flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors;
+}
+
+.sidebar-link.active {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground;
+}
+
+/* Dashboard stat card */
+.stat-card {
+    @apply bg-card rounded-lg border border-border p-6 transition-shadow duration-200;
+}
+
+.stat-card:hover {
+    @apply shadow-md;
+}
+
+.stat-card .stat-value {
+    @apply text-3xl font-bold text-foreground;
+    font-family: 'Manrope', sans-serif;
+}
+
+.stat-card .stat-label {
+    @apply text-sm text-muted-foreground mt-1;
+}
+
+/* Data table enhancements */
+.data-table thead th {
+    @apply bg-muted/50 text-muted-foreground font-semibold text-xs uppercase tracking-wider;
+}
+
+.data-table tbody tr {
+    @apply hover:bg-muted/30 transition-colors;
+}
+
+/* Form layout */
+.form-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+
+/* Modal/Dialog overlay */
+.dialog-overlay {
+    @apply fixed inset-0 bg-black/50 backdrop-blur-sm;
+}
+
+/* Badge for days */
+.day-badge {
+    @apply px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.day-badge.lunes { @apply bg-blue-100 text-blue-800; }
+.day-badge.martes { @apply bg-purple-100 text-purple-800; }
+.day-badge.miercoles { @apply bg-yellow-100 text-yellow-800; }
+.day-badge.jueves { @apply bg-green-100 text-green-800; }
+.day-badge.viernes { @apply bg-orange-100 text-orange-800; }
+.day-badge.sabado { @apply bg-pink-100 text-pink-800; }
+.day-badge.domingo { @apply bg-red-100 text-red-800; }
+
+/* Vendor badges */
+.vendor-badge {
+    @apply px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.vendor-badge.michel { @apply bg-sky-100 text-sky-800; }
+.vendor-badge.angie { @apply bg-rose-100 text-rose-800; }
+.vendor-badge.julian { @apply bg-emerald-100 text-emerald-800; }
+
+/* Empty state */
+.empty-state {
+    @apply flex flex-col items-center justify-center py-12 text-center;
+}
+
+.empty-state-icon {
+    @apply w-16 h-16 text-muted-foreground/30 mb-4;
+}
+
+/* Search input */
+.search-input {
+    @apply pl-10 bg-muted/50 border-0 focus:bg-background focus:ring-2 focus:ring-ring;
+}
+
+/* Filter bar */
+.filter-bar {
+    @apply flex flex-wrap items-center gap-4 p-4 bg-muted/30 rounded-lg;
+}
+
+/* Route sheet print */
+.route-sheet {
+    @apply bg-white p-8;
+}
+
+.route-sheet-header {
+    @apply text-center mb-8 border-b border-border pb-4;
+}
+
+.route-sheet-title {
+    @apply text-2xl font-bold text-foreground;
+    font-family: 'Manrope', sans-serif;
+}
+
+/* Card hover effect */
+.card-hover {
+    transition: box-shadow 0.2s ease-in-out;
+}
+
+.card-hover:hover {
+    box-shadow: 0 4px 6px -1px rgb(74 59 50 / 0.1), 0 2px 4px -2px rgb(74 59 50 / 0.1);
+}

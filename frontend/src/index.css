@@ -1,0 +1,130 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --background: 40 20% 98%;
+        --foreground: 25 17% 24%;
+        --card: 0 0% 100%;
+        --card-foreground: 25 17% 24%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 25 17% 24%;
+        --primary: 25 17% 24%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 30 10% 90%;
+        --secondary-foreground: 25 17% 24%;
+        --accent: 30 47% 64%;
+        --accent-foreground: 0 0% 100%;
+        --muted: 40 18% 96%;
+        --muted-foreground: 25 5% 45%;
+        --destructive: 0 70% 50%;
+        --destructive-foreground: 0 0% 100%;
+        --border: 30 10% 90%;
+        --input: 30 10% 90%;
+        --ring: 30 47% 64%;
+        --chart-1: 30 47% 64%;
+        --chart-2: 100 30% 32%;
+        --chart-3: 25 17% 24%;
+        --chart-4: 40 70% 70%;
+        --chart-5: 15 60% 55%;
+        --radius: 0.5rem;
+        --success: 100 30% 32%;
+        --warning: 30 47% 64%;
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+    body {
+        @apply bg-background text-foreground;
+        font-family: 'Inter', sans-serif;
+    }
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Manrope', sans-serif;
+    }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+}
+
+::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+}
+
+/* Table styles */
+.table-container {
+    @apply overflow-x-auto rounded-lg border border-border;
+}
+
+/* Animation utilities */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Form input focus enhancement */
+input:focus, select:focus, textarea:focus {
+    @apply ring-2 ring-ring ring-offset-1;
+}
+
+/* Card hover effect */
+.card-hover {
+    @apply transition-shadow duration-200 hover:shadow-md;
+}
+
+/* Badge variants */
+.badge-michel {
+    @apply bg-blue-100 text-blue-800;
+}
+
+.badge-angie {
+    @apply bg-pink-100 text-pink-800;
+}
+
+.badge-julian {
+    @apply bg-green-100 text-green-800;
+}
+
+/* Print styles for route sheet */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    .print-only {
+        display: block !important;
+    }
+    body {
+        background: white !important;
+    }
+}
+
+/* Custom button active state */
+button:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+/* Loading spinner */
+.spinner {
+    @apply animate-spin rounded-full border-2 border-muted border-t-primary;
+}
