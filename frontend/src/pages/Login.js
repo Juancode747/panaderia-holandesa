@@ -82,7 +82,7 @@ export default function Login() {
                     <Input
                       id="email"
                       type="email"
-                      placeholder="admin@panaderia.com"
+                      placeholder="correo@ejemplo.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="pl-10"
@@ -123,18 +123,7 @@ export default function Login() {
                   )}
                 </Button>
               </form>
-
-              <div className="mt-6 p-4 bg-muted rounded-lg">
-                <p className="text-sm text-muted-foreground">
-                  <strong>Credenciales por defecto:</strong>
-                </p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Email: admin@panaderia.com
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Contraseña: admin123
-                </p>
-              </div>
+         
             </CardContent>
           </Card>
         </div>
