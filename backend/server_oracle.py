@@ -1042,7 +1042,164 @@ async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
         "tiendas_por_ruta": stores_per_route,
         "tiendas_por_dia": stores_per_day
     }
+# =====================================================
+# VISTAS - ENDPOINTS
+# =====================================================
 
+@api_router.get("/vistas/detalle-facturas")
+async def get_detalle_facturas(current_user: dict = Depends(get_current_user)):
+    return execute_query("SELECT * FROM V_DETALLE_FACTURAS ORDER BY FECHA DESC")
+
+@api_router.get("/vistas/items-factura/{factura_id}")
+async def get_items_factura(factura_id: str, current_user: dict = Depends(get_current_user)):
+    return execute_query("SELECT * FROM V_ITEMS_FACTURA WHERE FACTURA_ID = :id", {"id": factura_id})
+
+@api_router.get("/vistas/productos-proveedor")
+async def get_vista_productos_proveedor(current_user: dict = Depends(get_current_user)):
+    return execute_query("SELECT * FROM V_PRODUCTOS_PROVEEDOR ORDER BY PRODUCTO")
+
+@api_router.get("/vistas/tiendas-ruta")
+async def get_vista_tiendas_ruta(current_user: dict = Depends(get_current_user)):
+    return execute_query("SELECT * FROM V_TIENDAS_RUTA ORDER BY RUTA_NOMBRE, NOMBRE_TIENDA")
+
+@api_router.get("/vistas/ventas-por-ruta")
+async def get_vista_ventas_por_ruta(current_user: dict = Depends(get_current_user)):
+    return execute_query("SELECT * FROM V_VENTAS_POR_RUTA ORDER BY RUTA")
+
+@api_router.get("/vistas/pedidos-por-tienda")
+async def get_vista_pedidos_por_tienda(current_user: dict = Depends(get_current_user)):
+    return execute_query("SELECT * FROM V_PEDIDOS_POR_TIENDA ORDER BY TOTAL_PEDIDOS DESC")
+
+
+# =====================================================
+# FUNCIONES - ENDPOINTS
+# =====================================================
+
+@api_router.get("/funciones/total-factura/{factura_id}")
+async def get_total_factura(factura_id: str, current_user: dict = Depends(get_current_user)):
+    result = execute_query("SELECT fn_total_factura(:id) AS total FROM dual", {"id": factura_id}, fetch="one")
+    return {"factura_id": factura_id, "total_neto": result["total"]}
+
+@api_router.get("/funciones/generar-numero-factura")
+async def get_numero_factura(current_user: dict = Depends(get_current_user)):
+    result = execute_query("SELECT fn_generar_numero_factura() AS numero FROM dual", fetch="one")
+    return {"numero_factura": result["numero"]}
+
+@api_router.get("/funciones/facturas-tienda-mes/{tienda_id}")
+async def get_facturas_tienda_mes(tienda_id: str, anio: int, mes: int, current_user: dict = Depends(get_current_user)):
+    result = execute_query(
+        "SELECT fn_facturas_tienda_mes(:tienda_id, :anio, :mes) AS total FROM dual",
+        {"tienda_id": tienda_id, "anio": anio, "mes": mes}, fetch="one"
+    )
+    return {"tienda_id": tienda_id, "anio": anio, "mes": mes, "total_facturas": result["total"]}
+
+@api_router.get("/funciones/ventas-ruta-fecha/{ruta_id}")
+async def get_ventas_ruta_fecha(ruta_id: str, fecha: str, current_user: dict = Depends(get_current_user)):
+    result = execute_query(
+        "SELECT fn_ventas_ruta_fecha(:ruta_id, TO_DATE(:fecha, 'YYYY-MM-DD')) AS total FROM dual",
+        {"ruta_id": ruta_id, "fecha": fecha}, fetch="one"
+    )
+    return {"ruta_id": ruta_id, "fecha": fecha, "total_ventas": result["total"]}
+
+@api_router.get("/funciones/usuario-tiene-permiso/{usuario_id}/{permiso_id}")
+async def get_usuario_tiene_permiso(usuario_id: str, permiso_id: str, current_user: dict = Depends(get_current_user)):
+    result = execute_query(
+        "SELECT fn_usuario_tiene_permiso(:usuario_id, :permiso_id) AS tiene FROM dual",
+        {"usuario_id": usuario_id, "permiso_id": permiso_id}, fetch="one"
+    )
+    return {"usuario_id": usuario_id, "permiso_id": permiso_id, "tiene_permiso": bool(result["tiene"])}
+
+@api_router.get("/funciones/producto-top-ruta/{ruta_id}")
+async def get_producto_top_ruta(ruta_id: str, current_user: dict = Depends(get_current_user)):
+    result = execute_query("SELECT fn_producto_top_ruta(:ruta_id) AS producto FROM dual", {"ruta_id": ruta_id}, fetch="one")
+    return {"ruta_id": ruta_id, "producto_mas_vendido": result["producto"]}
+
+
+# =====================================================
+# PROCEDIMIENTOS - ENDPOINTS
+# =====================================================
+
+class ActualizarRutaRequest(BaseModel):
+    ruta_id: str
+
+@api_router.get("/procedimientos/pedidos-por-ruta/{ruta_id}")
+async def sp_pedidos_por_ruta(ruta_id: str, current_user: dict = Depends(get_current_user)):
+    return execute_query(
+        """SELECT t.NOMBRE_TIENDA, t.NOMBRE_DUENO,
+                  COUNT(f.ID) AS TOTAL_PEDIDOS,
+                  NVL(SUM(f.TOTAL), 0) AS TOTAL_COMPRADO
+           FROM TIENDAS t
+           LEFT JOIN FACTURAS f ON t.ID = f.TIENDA_ID
+           WHERE t.RUTA_ID = :ruta_id
+           GROUP BY t.NOMBRE_TIENDA, t.NOMBRE_DUENO
+           ORDER BY t.NOMBRE_TIENDA""",
+        {"ruta_id": ruta_id}
+    )
+
+@api_router.get("/procedimientos/ventas-por-ruta")
+async def sp_ventas_por_ruta(current_user: dict = Depends(get_current_user)):
+    return execute_query(
+        """SELECT r.NOMBRE AS RUTA, COUNT(f.ID) AS TOTAL_FACTURAS,
+                  NVL(SUM(f.TOTAL), 0) AS TOTAL_VENTAS
+           FROM RUTAS r
+           LEFT JOIN FACTURAS f ON r.ID = f.RUTA_ID
+           WHERE r.ACTIVO = 1
+           GROUP BY r.NOMBRE
+           ORDER BY r.NOMBRE"""
+    )
+
+@api_router.get("/procedimientos/productos-proveedor/{proveedor_id}")
+async def sp_productos_proveedor(proveedor_id: str, current_user: dict = Depends(get_current_user)):
+    return execute_query(
+        "SELECT CODIGO, NOMBRE, PRECIO, DESCRIPCION FROM PRODUCTOS WHERE PROVEEDOR_ID = :proveedor_id ORDER BY NOMBRE",
+        {"proveedor_id": proveedor_id}
+    )
+
+@api_router.put("/procedimientos/actualizar-ruta-tienda/{tienda_id}")
+async def sp_actualizar_ruta_tienda(
+    tienda_id: str,
+    data: ActualizarRutaRequest,
+    current_user: dict = Depends(require_permission("tiendas_editar"))
+):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        p_resultado = cursor.var(oracledb.STRING)
+        cursor.callproc("SP_ACTUALIZAR_RUTA_TIENDA", [tienda_id, data.ruta_id, p_resultado])
+        conn.commit()
+        return {"resultado": p_resultado.getvalue()}
+    finally:
+        cursor.close()
+        conn.close()
+
+@api_router.get("/procedimientos/reporte-facturas-fecha")
+async def sp_reporte_facturas_fecha(
+    fecha_inicio: str,
+    fecha_fin: str,
+    current_user: dict = Depends(require_permission("reportes_ver"))
+):
+    result = execute_query(
+        """SELECT NUMERO_FACTURA, FECHA, TIENDA_NOMBRE, RUTA_NOMBRE,
+                  VENDEDOR_NOMBRE, SUBTOTAL, IVA, TOTAL, TOTAL_DEVOLUCIONES
+           FROM FACTURAS
+           WHERE FECHA BETWEEN TO_DATE(:inicio, 'YYYY-MM-DD') AND TO_DATE(:fin, 'YYYY-MM-DD')
+           ORDER BY FECHA, RUTA_NOMBRE""",
+        {"inicio": fecha_inicio, "fin": fecha_fin}
+    )
+    for row in result:
+        if row.get("fecha"):
+            row["fecha"] = row["fecha"].strftime("%Y-%m-%d") if hasattr(row["fecha"], 'strftime') else str(row["fecha"])
+    total = sum(r.get("total") or 0 for r in result)
+    devoluciones = sum(r.get("total_devoluciones") or 0 for r in result)
+    return {
+        "fecha_inicio": fecha_inicio,
+        "fecha_fin": fecha_fin,
+        "total_facturas": len(result),
+        "total_ventas": round(total, 2),
+        "total_devoluciones": round(devoluciones, 2),
+        "neto": round(total - devoluciones, 2),
+        "facturas": result
+    }
 # ==================== APP CONFIG ====================
 
 app.include_router(api_router)
